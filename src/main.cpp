@@ -1,12 +1,23 @@
 #include <Arduino.h>
 #include "yboard.h"
 
+// These pins are found on the back of the Y-board
+// They can be used to either detect or provide voltage
+// Examples are provided at the end of loop()
+#define PIN_1 8
+#define PIN_2 15
+
 
 void setup() {
   Serial.begin(9600);
   Yboard.setup();
   
-  //Add any code you just want to run once here.
+  // Currently, PIN_1 (#8) is set up to detect voltage and PIN_2 (#15) is set up to provide it
+  // Modify this if you'd like
+  pinMode(PIN_1, INPUT);
+  pinMode(PIN_2, OUTPUT);
+  
+  //Add any code you want to run just once here.
 }
 
 void loop() {
@@ -88,4 +99,33 @@ void loop() {
   Yboard.play_notes("T160 V2 O5 F D. C#8 D. C#8 D8 B8- O4 G8 F"); // BYU Fight Song
   // See lab 7 for info on how these strings work
   // ==========================
+
+  // Use these functions--digitalWrite() and digitalRead()--to detect and provide voltage for anything else
+  // A good place to start is with something you build on your breadboard :)
+
+  // =========READING EXTERNAL VOLTAGE=========
+  if (digitalRead(PIN_1)){ // digitalRead keeps an eye on PIN_1 (pin 8). Feel free to change between PIN_1 and PIN_2
+    Yboard.set_all_leds_color(255,0,0); // If voltage is detected in PIN_1, then all the Yboard LEDs will be set to red.
+  } else {
+    Yboard.set_all_leds_color(0,0,0); // If voltage is NOT detected in PIN_1, then all the Yboard LEDs will be turned off.
+  }
+  // Feel free to change or mess around with any of these values/functions
+  // ==========================
+
+  // =========PROVIDING VOLTAGE=========
+  if (Yboard.get_button(1)) {  // the get_button analyzes the state of button 1. If it is pressed it report "TRUE" otherwise it will report "FALSE."
+
+    Yboard.display.setCursor(3, 3); // Try removing some of these lines to see what happens! (maybe nothing)
+    Yboard.display.println("Button 1 pressed!");
+    Yboard.display.display();
+
+    digitalWrite(PIN_2, HIGH);  // this command will provide voltage from PIN_2 (pin 15).
+  } else {
+    digitalWrite(PIN_2, LOW);   // This stops providing voltage from PIN_2.
+
+    Yboard.display.clearDisplay(); // This code erases the previous message, but could cause conflicts with other lines
+    Yboard.display.display(); // Comment out or adjust this code if needed
+  }
+  // ==========================
+  
 }
